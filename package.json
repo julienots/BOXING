@@ -1,0 +1,19 @@
+{
+  "name": "boxing-legend",
+  "version": "1.0.0",
+  "description": "BOXING LEGEND — Rise to Immortality : simulateur de carrière de boxe 2.5D/3D (entraîneur & manager)",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node tools/server.js",
+    "build": "node tools/build.js",
+    "test": "node --test tests/*.test.js",
+    "e2e": "node tests/e2e/smoke.mjs"
+  },
+  "devDependencies": {
+    "three": "0.170.0",
+    "esbuild": "0.24.0",
+    "@fontsource/oswald": "5.1.0",
+    "@fontsource/inter": "5.1.0"
+  }
+}
