@@ -5,6 +5,7 @@ Simulateur de carrière de boxe en 3D : vous êtes **entraîneur et manager**. V
 ## Jouer
 
 - **Le plus simple** : ouvrir `dist/index.html` dans un navigateur (Chrome, Edge, Firefox, Chrome Android). Fichier unique, hors-ligne, aucun serveur.
+- **Android** : installer `dist/BoxingLegend.apk` (Android 7.0+, autoriser « sources inconnues »). Paysage, plein écran, commandes tactiles, sauvegardes locales. Bouton retour = pause / menu, deux fois = quitter.
 - **Développement** : `npm install` puis `npm start` → http://localhost:8080
 
 Aucune API payante, aucun serveur externe : sauvegardes locales (3 emplacements + auto), export/import JSON.
@@ -43,6 +44,10 @@ tests/       tests unitaires (npm test) et e2e navigateur (npm run e2e)
 ```
 
 `npm test` : 14 tests dont une carrière simulée de 4 ans (≈40 combats, progression ≈15 → ≈58).
+
+## APK Android
+
+`npm run apk` reconstruit `dist/BoxingLegend.apk` **sans SDK Android** : le jeu web (fichier unique) est embarqué dans une WebView WebGL plein écran (`tools/android/`). Les outils (android.jar, dx, apksig) sont téléchargés depuis Maven Central ; le manifeste binaire et la table de ressources sont générés par `pack.py`. Signature v2 avec une **clé de développement** (`tools/android/boxinglegend-dev.p12`, mot de passe `boxinglegend`) : gardez la même clé pour pouvoir installer les mises à jour par-dessus ; pour une publication sur le Play Store, utilisez votre propre clé (`KEYSTORE=... KEYSTORE_PASS=... npm run apk`).
 
 ## Limites connues (honnêtes)
 
