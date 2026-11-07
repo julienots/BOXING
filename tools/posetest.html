@@ -1,0 +1,70 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Pose test</title>
+<script type="importmap">{"imports":{"three":"../vendor/three/build/three.module.min.js","three/addons/":"../vendor/three/addons/"}}</script>
+<style>html,body{margin:0;background:#222;overflow:hidden}canvas{width:100vw;height:100vh;display:block}</style></head>
+<body><canvas id="c"></canvas>
+<script type="module">
+import * as THREE from 'three';
+import { Renderer } from '../src/render/renderer.js';
+import { BoxerModel } from '../src/render/boxerModel.js';
+import { Animator } from '../src/render/animator.js';
+import { createBoxer, randomAppearance, randomOutfit, defaultAppearance } from '../src/core/boxer.js';
+import { legendBoxer } from '../src/data/legends.js';
+const params = new URLSearchParams(location.search);
+const R = new Renderer(document.getElementById('c'), 'medium');
+const scene = new THREE.Scene(); scene.background = new THREE.Color('#2a2e36');
+const cam = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+const view = params.get('view') || 'front';
+if (view === 'front') { cam.position.set(0, 1.4, 7.5); cam.lookAt(0, 1.1, 0); }
+else if (view === 'side') { cam.position.set(7.5, 1.4, 0); cam.lookAt(0, 1.1, 0); }
+else if (view === 'face') { cam.position.set(-3, 1.7, 2.2); cam.lookAt(-3, 1.65, 0); cam.fov = 12; cam.updateProjectionMatrix(); }
+if (params.get('cam')) { const c = params.get('cam').split(',').map(Number), l = (params.get('look')||'0,1.2,0').split(',').map(Number); cam.position.set(...c); cam.lookAt(...l); cam.fov = +(params.get('fov')||35); cam.updateProjectionMatrix(); }
+R.setScene(scene, cam);
+scene.add(new THREE.HemisphereLight('#bcd', '#432', 0.8));
+const key = new THREE.DirectionalLight('#fff', 2.2); key.position.set(3, 6, 5); key.castShadow = true; key.shadow.mapSize.set(2048,2048);
+key.shadow.camera.left=-6;key.shadow.camera.right=6;key.shadow.camera.top=4;key.shadow.camera.bottom=-1; scene.add(key);
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), new THREE.MeshStandardMaterial({ color: '#555' })); floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; scene.add(floor);
+const modes = ['guard','punch_cross','punch_lhook','block','fall','victory','train_bench','corner'];
+const boxers = [legendBoxer('cyclone'), legendBoxer('butterfly'), createBoxer({ isPlayer: true }), legendBoxer('mountain'), legendBoxer('untouchable'), legendBoxer('tornado'), legendBoxer('velvet'), legendBoxer('professor')];
+const items = [];
+const only = params.get('only'); if (only != null) { const keep = boxers[+only]; boxers.length = 0; boxers.push(keep); }
+boxers.forEach((b, i) => {
+  const m = new BoxerModel(b); const a = new Animator(m);
+  m.root.position.set(only != null ? 0 : (i - 3.5) * 1.0, 0, 0);
+  if (view !== 'front') m.root.rotation.y = 0;
+  scene.add(m.root); items.push({ m, a, mode: params.get('mode') || modes[i] });
+  if (params.get('robe')) m.setRobe(true);
+});
+// Faux acteur pour tester les poses de combat.
+function fakeActor(b, mode, t){
+  const ac = { stamina: 80, staminaMax: 100, boxer: b, state: 'fight', tech: new Set(), moveCmd:{f:0,l:0}, hitFlash:0, block:null, action:null };
+  if (mode === 'punch_cross') ac.action = { kind:'punch', type:'cross', target:'head', t: 0.2, startup:0.2, active:0.07, recovery:0.25 };
+  if (mode === 'punch_lhook') ac.action = { kind:'punch', type:'lhook', target:'head', t: 0.2, startup:0.2, active:0.07, recovery:0.25 };
+  if (mode === 'punch_jab') ac.action = { kind:'punch', type:'jab', target:'head', t: 0.12, startup:0.12, active:0.07, recovery:0.25 };
+  if (mode === 'punch_upper') ac.action = { kind:'punch', type:'rupper', target:'head', t: 0.24, startup:0.24, active:0.07, recovery:0.25 };
+  if (mode === 'punch_body') ac.action = { kind:'punch', type:'lhook', target:'body', t: 0.2, startup:0.2, active:0.07, recovery:0.25 };
+  if (mode === 'block') ac.block = 'high';
+  if (mode === 'fall') ac.state = 'out';
+  return ac;
+}
+// Cible : un mannequin invisible devant.
+const target = new BoxerModel(createBoxer({})); target.root.visible = false; scene.add(target.root);
+let t = 0;
+function frame(){
+  const dt = 1/60; t += dt;
+  for (const it of items) {
+    if (it.mode.startsWith('train_')) it.a.updateTraining(dt, it.mode.slice(6));
+    else if (it.mode === 'victory') it.a.updateVictory(dt);
+    else if (it.mode === 'corner') it.a.updateCorner(dt);
+    else if (it.mode === 'idle') it.a.updateIdle(dt, {});
+    else {
+      target.root.position.set(it.m.root.position.x, 0, 0.85); target.root.rotation.y = Math.PI; target.root.updateMatrixWorld(true);
+      it.a.updateFight(dt, fakeActor(it.m.boxer, it.mode, t), target, null);
+    }
+  }
+  R.render();
+}
+for (let i = 0; i < 90; i++) frame();
+window.__ready = true;
+setInterval(frame, 33);
+</script></body></html>

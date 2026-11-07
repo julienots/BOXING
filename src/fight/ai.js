@@ -351,7 +351,7 @@ export class HumanController {
   think(dt, eng) {
     this.engine = eng;
     const i = this.input;
-    const c = { move: { f: i.axisF(), l: i.axisL() }, block: i.held('blockBody') ? 'body' : i.held('block') ? 'high' : null };
+    const c = { move: i.moveFor ? i.moveFor(this.me) : { f: i.axisF(), l: i.axisL() }, block: i.held('blockBody') ? 'body' : i.held('block') ? 'high' : null };
     const pr = i.consumePunch();
     if (pr) c.punch = pr;
     const def = i.consumeAction();
