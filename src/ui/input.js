@@ -94,14 +94,15 @@ export function buildTouchControls(container, input) {
   wrap.className = 'touch';
   wrap.innerHTML = `
     <div class="tstick"><div class="tknob"></div></div>
-    <div class="tbtns">
-      <button data-p="jab">Jab</button><button data-p="cross">Direct</button>
-      <button data-p="lhook">Crochet AV</button><button data-p="rhook">Crochet AR</button>
-      <button data-p="lupper">Upper AV</button><button data-p="rupper">Upper AR</button>
+    <div class="tdef">
       <button data-h="block" class="def">Garde</button><button data-h="blockBody" class="def">Garde corps</button>
       <button data-a="slip" class="def">Esquive</button><button data-a="duck" class="def">Baisser</button>
       <button data-a="back" class="def">Recul</button><button data-a="clinch" class="def">Clinch</button>
-      <button data-t="body" class="tog">Corps</button>
+    </div>
+    <div class="tbtns">
+      <button data-p="lhook">Crochet AV</button><button data-p="rhook">Crochet AR</button><button data-t="body" class="tog">Corps</button>
+      <button data-p="lupper">Upper AV</button><button data-p="rupper">Upper AR</button><span></span>
+      <button data-p="jab" class="big1">Jab</button><button data-p="cross" class="big1">Direct</button>
     </div>`;
   container.appendChild(wrap);
   const stick = wrap.querySelector('.tstick'), knob = wrap.querySelector('.tknob');

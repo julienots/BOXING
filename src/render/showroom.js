@@ -48,12 +48,12 @@ export class Showroom {
     this.anim.updateIdle(dt, { energy: 0.6, shadow: this.layout !== 'close', style: this.boxer.style });
     this.model.root.rotation.y = this.yaw + this.dragYaw + Math.sin(this.t * 0.3) * 0.15;
     const H = this.model.D.H;
-    const w = window.innerWidth, narrow = w < 860;
+    const w = window.innerWidth, narrow = w < 860 && window.innerHeight > w; // portrait étroit
     let pos, look;
     if (this.layout === 'close') { look = new THREE.Vector3(0, H * 0.9, 0); pos = new THREE.Vector3(0, H * 0.92, 1.25); }
     else if (narrow) { look = new THREE.Vector3(0, H * 0.55 - (this.layout === 'center' ? 0 : -0.35), 0); pos = new THREE.Vector3(0, H * 0.7, 5.6); }
     else {
-      const off = this.layout === 'left' ? 1.25 : this.layout === 'right' ? -1.25 : 0;
+      const off = (this.layout === 'left' ? 1.25 : this.layout === 'right' ? -1.25 : 0) * (window.innerHeight < 540 ? 1.15 : 1);
       look = new THREE.Vector3(off, H * 0.55, 0); pos = new THREE.Vector3(off, H * 0.62, 5.2);
     }
     this.camPos.lerp(pos, Math.min(1, dt * 3)); this.look.lerp(look, Math.min(1, dt * 3));

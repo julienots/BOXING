@@ -206,7 +206,8 @@ export class FightView {
     } else {
       const mx = (E.a.x + E.b.x) / 2, mz = (E.a.z + E.b.z) / 2;
       const d = Math.hypot(E.a.x - E.b.x, E.a.z - E.b.z);
-      const zoom = clamp(0.85 + d * 0.12, 0.9, 1.25) * (this.mode === 'end' ? 0.8 : 1);
+      const small = window.innerHeight < 540 && window.innerWidth > window.innerHeight;
+      const zoom = clamp(0.85 + d * 0.12, 0.9, 1.25) * (this.mode === 'end' ? 0.8 : 1) * (small ? 0.86 : 1);
       look = new THREE.Vector3(mx * 0.85, 0.9, mz * 0.85);
       pos = new THREE.Vector3(look.x + cm.side * zoom, cm.height * zoom, look.z + cm.back * zoom);
     }
@@ -221,6 +222,10 @@ export class FightView {
       this.shake = Math.max(0, this.shake - dt * 1.2);
     }
     this.camera.lookAt(this.camLook);
+    // Téléphone en paysage : décale l'image pour garder l'action hors des commandes tactiles.
+    const W = window.innerWidth, H = window.innerHeight;
+    if (H < 540 && W > H && this.mode !== 'replay') this.camera.setViewOffset(W, H, W * 0.09, H * 0.07, W, H);
+    else if (this.camera.view) this.camera.clearViewOffset();
   }
 
   // --------------------------------------------------------------- ralentis

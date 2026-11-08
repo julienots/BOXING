@@ -180,7 +180,7 @@ class App {
       this.setView(this.gym.scene, cam, (dt) => {
         this.gym.update(dt);
         const p = this.gym.boxerPosition();
-        const narrow = window.innerWidth < 860;
+        const narrow = window.innerWidth < 860 && window.innerHeight > window.innerWidth;
         look.lerp(new THREE.Vector3(p.x, 1.0, p.z), Math.min(1, dt * 3));
         const dist = narrow ? 5.2 : 4.6;
         cam.position.set(look.x + Math.sin(ang) * dist, 2.6, look.z + Math.cos(ang) * dist);
